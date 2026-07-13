@@ -1,0 +1,27 @@
+kind = "web"
+previewPath = "/"
+title = "GAMVA"
+version = "1.0.0"
+id = "artifacts/gamva"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 23067
+
+[services.development]
+run = "pnpm --filter @workspace/gamva run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/gamva", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/gamva/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "23067"
+BASE_PATH = "/"
