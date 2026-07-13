@@ -1,0 +1,1 @@
+- [Vercel/Next.js port without src/ layout](vercel-app-router-port.md) — App Router (`app/`) migrations aren't handled by fullstack-copy-frontend.sh's auto-detection; port files by hand instead of forcing the script.

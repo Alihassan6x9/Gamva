@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation, useParams } from "wouter";
 import { ref, onValue, onDisconnect, remove, update } from "firebase/database";
-import { db, ensureSignedIn } from "@/lib/firebase";
+import { db, ensureSignedIn, isFirebaseConfigured } from "@/lib/firebase";
 import { pickPrompts } from "@/lib/prompts/thisOrThat";
 import GameView from "./GameView";
 
@@ -15,6 +15,11 @@ export default function RoomPage() {
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
+    if (!isFirebaseConfigured) {
+      setNotFound(true);
+      return;
+    }
+
     const storedId = localStorage.getItem(`gamva:${code}:playerId`);
     if (!storedId) {
       navigate(`/?join=${code}`, { replace: true });

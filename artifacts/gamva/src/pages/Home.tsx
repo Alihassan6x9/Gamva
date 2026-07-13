@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation, useSearch } from "wouter";
 import { ref, set, get, serverTimestamp } from "firebase/database";
-import { db, ensureSignedIn } from "@/lib/firebase";
+import { db, ensureSignedIn, isFirebaseConfigured } from "@/lib/firebase";
 import { generateRoomCode, normalizeRoomCode, generatePlayerId } from "@/lib/roomCode";
 
 const AGE_MIN = 13;
@@ -94,7 +94,11 @@ export default function HomePage() {
       navigate(`/room/${code}`);
     } catch (err) {
       console.error(err);
-      setError("Couldn't create the room. Check your connection and try again.");
+      setError(
+        err instanceof Error && !isFirebaseConfigured
+          ? err.message
+          : "Couldn't create the room. Check your connection and try again."
+      );
       setLoading(false);
     }
   }
@@ -137,7 +141,11 @@ export default function HomePage() {
       navigate(`/room/${code}`);
     } catch (err) {
       console.error(err);
-      setError("Couldn't join the room. Check your connection and try again.");
+      setError(
+        err instanceof Error && !isFirebaseConfigured
+          ? err.message
+          : "Couldn't join the room. Check your connection and try again."
+      );
       setLoading(false);
     }
   }
