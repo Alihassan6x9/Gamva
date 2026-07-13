@@ -1,6 +1,7 @@
 import { initializeApp, getApps, getApp, type FirebaseApp } from "firebase/app";
 import { getDatabase, type Database } from "firebase/database";
 import { getAuth, signInAnonymously, onAuthStateChanged, type Auth, type User } from "firebase/auth";
+import { getFirestore, type Firestore } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -22,15 +23,21 @@ export const isFirebaseConfigured = Boolean(
 let app: FirebaseApp | null = null;
 let dbInstance: Database | null = null;
 let authInstance: Auth | null = null;
+let firestoreInstance: Firestore | null = null;
 
 if (isFirebaseConfigured) {
   app = getApps().length ? getApp() : initializeApp(firebaseConfig);
   dbInstance = getDatabase(app);
   authInstance = getAuth(app);
+  // Firestore is used purely as the WebRTC signaling channel (offers,
+  // answers, ICE candidates) for voice/video calls. Room/game state stays
+  // on the Realtime Database — the original app's data store.
+  firestoreInstance = getFirestore(app);
 }
 
 export const db = dbInstance as Database;
 export const auth = authInstance as Auth;
+export const firestore = firestoreInstance as Firestore;
 
 // Every visitor is signed in anonymously in the background so Firebase
 // security rules can require auth without ever showing a login screen.

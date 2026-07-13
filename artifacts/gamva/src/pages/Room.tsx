@@ -1,8 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useLocation, useParams } from "wouter";
 import { ref, onValue, onDisconnect, remove, update } from "firebase/database";
 import { db, ensureSignedIn, isFirebaseConfigured } from "@/lib/firebase";
 import { pickPrompts } from "@/lib/prompts/thisOrThat";
+import { useRoomCall } from "@/hooks/useRoomCall";
+import CommunicationSettings from "@/components/call/CommunicationSettings";
+import CallBar from "@/components/call/CallBar";
 import GameView from "./GameView";
 
 export default function RoomPage() {
@@ -50,13 +53,34 @@ export default function RoomPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [code]);
 
+  const players = room?.players
+    ? Object.entries(room.players as Record<string, any>).sort(
+        (a, b) => (a[1].joinedAt || 0) - (b[1].joinedAt || 0)
+      )
+    : [];
+  const remotePeerIds = useMemo(
+    () => players.map(([id]) => id).filter((id) => id !== playerId),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [players.map(([id]) => id).join(","), playerId]
+  );
+
+  const call = useRoomCall({ roomCode: code, selfId: playerId || "", remotePeerIds });
+
   function leaveRoom() {
+    call.leaveCall();
     if (playerId) {
       remove(ref(db, `rooms/${code}/players/${playerId}`));
       localStorage.removeItem(`gamva:${code}:playerId`);
     }
     navigate("/");
   }
+
+  // Stop any active media/peer connections if the tab navigates away or
+  // closes without an explicit "leave room" click.
+  useEffect(() => {
+    return () => call.leaveCall();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   function copyLink() {
     const url = `${window.location.origin}/room/${code}`;
@@ -101,19 +125,39 @@ export default function RoomPage() {
     );
   }
 
-  const players = room.players
-    ? Object.entries(room.players as Record<string, any>).sort(
-        (a, b) => (a[1].joinedAt || 0) - (b[1].joinedAt || 0)
-      )
-    : [];
   const isHost = room.hostId === playerId;
+  const selfName = room.players?.[playerId]?.name ?? "";
+  const playerInfos = players.map(([id, p]) => ({
+    id,
+    name: p.name,
+    micOn: !!p.micOn,
+    cameraOn: !!p.cameraOn,
+  }));
 
   if (room.status === "playing" || room.status === "finished") {
-    return <GameView code={code} room={room} playerId={playerId} isHost={isHost} />;
+    return (
+      <>
+        {call.connectionsNode}
+        <GameView code={code} room={room} playerId={playerId} isHost={isHost} />
+        <CallBar
+          selfId={playerId}
+          selfName={selfName}
+          players={playerInfos}
+          localStream={call.localStream}
+          micOn={call.micOn}
+          cameraOn={call.cameraOn}
+          onToggleMic={call.toggleMic}
+          onToggleCamera={call.toggleCamera}
+          onLeaveCall={call.leaveCall}
+          remotePeers={call.remotePeers}
+        />
+      </>
+    );
   }
 
   return (
     <main className="shell">
+      {call.connectionsNode}
       <div style={{ marginBottom: 22 }}>
         <span className="wordmark" style={{ fontSize: 22 }}>
           GAM<span className="dot">V</span>A
@@ -148,20 +192,23 @@ export default function RoomPage() {
         ))}
       </div>
 
-      {isHost ? (
-        <button
-          className="btn btn-primary"
-          disabled={players.length < 2}
-          onClick={startGame}
-          style={{ marginBottom: 12 }}
-        >
-          {players.length < 2 ? "Waiting for more players…" : "Start game: This or That"}
-        </button>
-      ) : (
-        <div className="card" style={{ textAlign: "center", color: "var(--ink-dim)", marginBottom: 12 }}>
-          Waiting for the host to start the game…
-        </div>
-      )}
+      <CommunicationSettings
+        selfId={playerId}
+        selfName={selfName}
+        players={playerInfos}
+        localStream={call.localStream}
+        micOn={call.micOn}
+        cameraOn={call.cameraOn}
+        micBusy={call.micBusy}
+        cameraBusy={call.cameraBusy}
+        mediaError={call.mediaError}
+        onToggleMic={call.toggleMic}
+        onToggleCamera={call.toggleCamera}
+        remotePeers={call.remotePeers}
+        isHost={isHost}
+        canStart={players.length >= 2}
+        onStartGame={startGame}
+      />
 
       <button className="btn-ghost" onClick={leaveRoom}>
         Leave room
