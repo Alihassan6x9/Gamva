@@ -18,3 +18,14 @@ expertMode = true
 [postMerge]
 path = "scripts/post-merge.sh"
 timeoutMs = 20000
+
+[userenv]
+
+[userenv.shared]
+VITE_FIREBASE_API_KEY = "AIzaSyB3aACMsEAnB4G3z6dNlz6xDm7TydTmY8Y"
+VITE_FIREBASE_APP_ID = "1:676401286347:web:c4a78afbf457bb06b69f4e"
+VITE_FIREBASE_AUTH_DOMAIN = "gamva-13195.firebaseapp.com"
+VITE_FIREBASE_DATABASE_URL = "https://gamva-13195-default-rtdb.firebaseio.com"
+VITE_FIREBASE_MESSAGING_SENDER_ID = "676401286347"
+VITE_FIREBASE_PROJECT_ID = "gamva-13195"
+VITE_FIREBASE_STORAGE_BUCKET = "gamva-13195.firebasestorage.app"

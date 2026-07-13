@@ -1,0 +1,21 @@
+rules_version = '2';
+
+// Firestore is used only as the signaling channel for GAMVA's optional
+// voice/video calls (WebRTC SDP offers/answers + ICE candidates). Actual
+// audio/video streams flow peer-to-peer and never touch Firestore.
+// Room/game state itself lives in the Realtime Database, not here.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /gamvaCalls/{roomCode}/pairs/{pairId} {
+      // Every player is signed in anonymously before touching Firebase, so
+      // this only requires that the request carries a valid Firebase auth
+      // token — no per-user field checks are needed since signaling docs
+      // are keyed by room + player pair, not by a single owner.
+      allow read, write: if request.auth != null;
+
+      match /candidates/{candidateId} {
+        allow read, write: if request.auth != null;
+      }
+    }
+  }
+}
