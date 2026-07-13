@@ -2,8 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ref, onValue, onDisconnect, remove } from "firebase/database";
+import { ref, onValue, onDisconnect, remove, update } from "firebase/database";
 import { db, ensureSignedIn } from "@/lib/firebase";
+import { pickPrompts } from "@/lib/prompts/thisOrThat";
+import GameView from "./GameView";
 
 export default function RoomClient({ code }) {
   const router = useRouter();
@@ -57,6 +59,19 @@ export default function RoomClient({ code }) {
     setTimeout(() => setCopied(false), 1800);
   }
 
+  async function startGame() {
+    const prompts = pickPrompts(8);
+    await update(ref(db, `rooms/${code}`), {
+      status: "playing",
+      game: {
+        type: "this-or-that",
+        round: 0,
+        prompts,
+        votes: {},
+      },
+    });
+  }
+
   if (notFound) {
     return (
       <main className="shell">
@@ -84,6 +99,10 @@ export default function RoomClient({ code }) {
     ? Object.entries(room.players).sort((a, b) => (a[1].joinedAt || 0) - (b[1].joinedAt || 0))
     : [];
   const isHost = room.hostId === playerId;
+
+  if (room.status === "playing" || room.status === "finished") {
+    return <GameView code={code} room={room} playerId={playerId} isHost={isHost} />;
+  }
 
   return (
     <main className="shell">
@@ -122,8 +141,13 @@ export default function RoomClient({ code }) {
       </div>
 
       {isHost ? (
-        <button className="btn btn-primary" disabled={players.length < 2} style={{ marginBottom: 12 }}>
-          {players.length < 2 ? "Waiting for more players…" : "Start game (coming next)"}
+        <button
+          className="btn btn-primary"
+          disabled={players.length < 2}
+          onClick={startGame}
+          style={{ marginBottom: 12 }}
+        >
+          {players.length < 2 ? "Waiting for more players…" : "Start game: This or That"}
         </button>
       ) : (
         <div className="card" style={{ textAlign: "center", color: "var(--ink-dim)", marginBottom: 12 }}>
