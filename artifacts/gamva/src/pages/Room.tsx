@@ -6,6 +6,7 @@ import { pickPrompts } from "@/lib/prompts/thisOrThat";
 import { useRoomCall } from "@/hooks/useRoomCall";
 import CommunicationSettings from "@/components/call/CommunicationSettings";
 import CallBar from "@/components/call/CallBar";
+import CallErrorBoundary from "@/components/call/CallErrorBoundary";
 import GameView from "./GameView";
 
 export default function RoomPage() {
@@ -137,27 +138,31 @@ export default function RoomPage() {
   if (room.status === "playing" || room.status === "finished") {
     return (
       <>
-        {call.connectionsNode}
+        <CallErrorBoundary>
+          {call.connectionsNode}
+        </CallErrorBoundary>
         <GameView code={code} room={room} playerId={playerId} isHost={isHost} />
-        <CallBar
-          selfId={playerId}
-          selfName={selfName}
-          players={playerInfos}
-          localStream={call.localStream}
-          micOn={call.micOn}
-          cameraOn={call.cameraOn}
-          onToggleMic={call.toggleMic}
-          onToggleCamera={call.toggleCamera}
-          onLeaveCall={call.leaveCall}
-          remotePeers={call.remotePeers}
-        />
+        <CallErrorBoundary>
+          <CallBar
+            selfId={playerId}
+            selfName={selfName}
+            players={playerInfos}
+            localStream={call.localStream}
+            micOn={call.micOn}
+            cameraOn={call.cameraOn}
+            onToggleMic={call.toggleMic}
+            onToggleCamera={call.toggleCamera}
+            onLeaveCall={call.leaveCall}
+            remotePeers={call.remotePeers}
+          />
+        </CallErrorBoundary>
       </>
     );
   }
 
   return (
     <main className="shell">
-      {call.connectionsNode}
+      <CallErrorBoundary>{call.connectionsNode}</CallErrorBoundary>
       <div style={{ marginBottom: 22 }}>
         <span className="wordmark" style={{ fontSize: 22 }}>
           GAM<span className="dot">V</span>A
@@ -192,23 +197,25 @@ export default function RoomPage() {
         ))}
       </div>
 
-      <CommunicationSettings
-        selfId={playerId}
-        selfName={selfName}
-        players={playerInfos}
-        localStream={call.localStream}
-        micOn={call.micOn}
-        cameraOn={call.cameraOn}
-        micBusy={call.micBusy}
-        cameraBusy={call.cameraBusy}
-        mediaError={call.mediaError}
-        onToggleMic={call.toggleMic}
-        onToggleCamera={call.toggleCamera}
-        remotePeers={call.remotePeers}
-        isHost={isHost}
-        canStart={players.length >= 2}
-        onStartGame={startGame}
-      />
+      <CallErrorBoundary>
+        <CommunicationSettings
+          selfId={playerId}
+          selfName={selfName}
+          players={playerInfos}
+          localStream={call.localStream}
+          micOn={call.micOn}
+          cameraOn={call.cameraOn}
+          micBusy={call.micBusy}
+          cameraBusy={call.cameraBusy}
+          mediaError={call.mediaError}
+          onToggleMic={call.toggleMic}
+          onToggleCamera={call.toggleCamera}
+          remotePeers={call.remotePeers}
+          isHost={isHost}
+          canStart={players.length >= 2}
+          onStartGame={startGame}
+        />
+      </CallErrorBoundary>
 
       <button className="btn-ghost" onClick={leaveRoom}>
         Leave room

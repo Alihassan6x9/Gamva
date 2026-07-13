@@ -18,6 +18,10 @@ export default function VideoTile({
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const hasVideo = cameraOn && !!stream && stream.getVideoTracks().length > 0;
+  // Player records can be transiently incomplete (e.g. a snapshot mid-write,
+  // or a stale reference to a player who just left) — never let a missing
+  // name crash the whole call UI.
+  const safeName = (name ?? "").trim();
 
   useEffect(() => {
     if (videoRef.current) {
@@ -44,13 +48,13 @@ export default function VideoTile({
         />
       ) : (
         <div className="video-tile-placeholder">
-          <span className="video-tile-initial">{name.trim().charAt(0).toUpperCase() || "?"}</span>
+          <span className="video-tile-initial">{safeName.charAt(0).toUpperCase() || "?"}</span>
           <VideoOff size={compact ? 12 : 16} className="video-tile-camera-off-icon" />
         </div>
       )}
 
       <div className="video-tile-footer">
-        <span className="video-tile-name">{isSelf ? `${name} (you)` : name}</span>
+        <span className="video-tile-name">{isSelf ? `${safeName || "You"} (you)` : safeName || "Player"}</span>
         {micOn ? <Mic size={12} /> : <MicOff size={12} className="video-tile-muted-icon" />}
       </div>
     </div>
