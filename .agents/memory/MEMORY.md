@@ -1,1 +1,2 @@
 - [Vercel/Next.js port without src/ layout](vercel-app-router-port.md) — App Router (`app/`) migrations aren't handled by fullstack-copy-frontend.sh's auto-detection; port files by hand instead of forcing the script.
+- [Firebase rules deploy & verify](firebase-rules-deploy-and-verify.md) — no CLI/service-account deploy path here; have the user paste rules manually, then verify via anonymous-auth REST calls instead of a headless browser.
