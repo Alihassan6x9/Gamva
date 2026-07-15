@@ -58,11 +58,12 @@ export default function RoomPage() {
   console.log("PLAYER ENTRIES:", Object.entries(room?.players || {}));
   console.log("PLAYER COUNT:", Object.entries(room?.players || {}).length);
 
-  const players = room?.players
-    ? Object.entries(room.players as Record<string, any>).sort(
-        (a, b) => (a[1].joinedAt || 0) - (b[1].joinedAt || 0)
-      )
-    : [];
+  const players = Object.entries(room?.players || {})
+  .filter(([id]) => id)
+  .sort(
+    (a, b) =>
+      (a[1] as any).joinedAt - (b[1] as any).joinedAt
+  );
 
   const remotePeerIds = useMemo(
     () => players.map(([id]) => id).filter((id) => id !== playerId),

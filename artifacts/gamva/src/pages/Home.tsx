@@ -130,7 +130,6 @@ export default function HomePage() {
       console.log("Player Keys:", playerKeys);
       console.log("Player Count:", playerKeys.length);
       console.log("room.players =", room.players);
-      alert(JSON.stringify(room.players));
 
       const existingPlayerCount = room.players
         ? Object.keys(room.players).length
