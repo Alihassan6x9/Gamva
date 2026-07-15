@@ -124,7 +124,12 @@ export default function HomePage() {
         setLoading(false);
         return;
       }
-      const existingPlayerCount = room.players ? Object.keys(room.players).length : 0;
+      const playerKeys = Object.keys(room.players || {});
+
+      console.log("Room:", room);
+      console.log("Player Keys:", playerKeys);
+      console.log("Player Count:", playerKeys.length);
+      const existingPlayerCount = playerKeys.length;
       if (existingPlayerCount >= 2) {
         setError("Room is full. Only 2 players are allowed.");
         setLoading(false);
