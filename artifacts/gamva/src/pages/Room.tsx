@@ -8,6 +8,7 @@ import CommunicationSettings from "@/components/call/CommunicationSettings";
 import CallBar from "@/components/call/CallBar";
 import CallErrorBoundary from "@/components/call/CallErrorBoundary";
 import GameView from "./GameView";
+import { Copy, Check, Users } from "lucide-react";
 
 export default function RoomPage() {
   const params = useParams<{ code: string }>();
@@ -37,8 +38,6 @@ export default function RoomPage() {
       await ensureSignedIn();
       const roomRef = ref(db, `rooms/${code}`);
 
-      // If this player's connection drops (tab closed, phone locked and
-      // network lost, etc), remove them from the live list automatically.
       onDisconnect(ref(db, `rooms/${code}/players/${storedId}`)).remove();
 
       unsubscribe = onValue(roomRef, (snap) => {
@@ -76,8 +75,6 @@ export default function RoomPage() {
     navigate("/");
   }
 
-  // Stop any active media/peer connections if the tab navigates away or
-  // closes without an explicit "leave room" click.
   useEffect(() => {
     return () => call.leaveCall();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -105,10 +102,11 @@ export default function RoomPage() {
 
   if (notFound) {
     return (
-      <main className="shell">
-        <div className="card">
-          <p style={{ marginTop: 0 }}>
-            This room doesn't exist anymore — the host may have closed it.
+      <main className="shell fade-in flex items-center justify-center">
+        <div className="card text-center max-w-sm w-full py-12">
+          <h2 className="font-display font-bold text-2xl text-slate-800 mb-4">Room closed</h2>
+          <p className="text-slate-500 mb-8">
+            This room doesn't exist anymore — the host may have closed it or it timed out.
           </p>
           <button className="btn btn-primary" onClick={() => navigate("/")}>
             Back home
@@ -120,7 +118,8 @@ export default function RoomPage() {
 
   if (!room || !playerId) {
     return (
-      <main className="shell">
+      <main className="shell flex flex-col items-center justify-center fade-in">
+        <div className="w-12 h-12 border-4 border-slate-200 border-t-purple-500 rounded-full animate-spin mb-4"></div>
         <div className="eyebrow">loading room…</div>
       </main>
     );
@@ -137,7 +136,7 @@ export default function RoomPage() {
 
   if (room.status === "playing" || room.status === "finished") {
     return (
-      <>
+      <div className="min-h-screen bg-slate-50 pb-32">
         <CallErrorBoundary>
           {call.connectionsNode}
         </CallErrorBoundary>
@@ -156,45 +155,56 @@ export default function RoomPage() {
             remotePeers={call.remotePeers}
           />
         </CallErrorBoundary>
-      </>
+      </div>
     );
   }
 
   return (
-    <main className="shell">
+    <main className="shell-sm w-full fade-in pt-8">
       <CallErrorBoundary>{call.connectionsNode}</CallErrorBoundary>
-      <div style={{ marginBottom: 22 }}>
-        <span className="wordmark" style={{ fontSize: 22 }}>
-          GAM<span className="dot">V</span>A
-        </span>
+      
+      <div className="text-center mb-8">
+        <h1 className="font-display font-bold text-3xl text-slate-900 mb-2">Game Lobby</h1>
+        <p className="text-slate-500">Wait for everyone to join before starting.</p>
       </div>
 
-      <div className="ticket" style={{ marginBottom: 10 }}>
+      <div className="ticket mb-6 shadow-sm border-purple-100">
         <div>
-          <div className="ticket-label">room code</div>
+          <div className="ticket-label text-purple-600 font-bold">room code</div>
           <div className="ticket-code">{code}</div>
         </div>
         <div className="ticket-divider" />
-        <button className="btn-ghost" onClick={copyLink}>
-          {copied ? "Link copied ✓" : "Copy invite link"}
+        <button 
+          className="bg-purple-50 hover:bg-purple-100 text-purple-700 px-4 py-3 rounded-xl font-bold text-sm transition-colors flex flex-col items-center gap-1 w-[120px]" 
+          onClick={copyLink}
+        >
+          {copied ? <Check size={20} className="text-emerald-500" /> : <Copy size={20} />}
+          {copied ? "Copied!" : "Copy Link"}
         </button>
       </div>
 
-      <p style={{ color: "var(--ink-dim)", fontSize: 14, marginTop: 4, marginBottom: 22 }}>
-        Share this code — friends tap "Join room" on GAMVA and type it in.
-      </p>
-
-      <div className="card" style={{ marginBottom: 18 }}>
-        <div className="ticket-label" style={{ marginBottom: 10 }}>
-          players ({players.length})
-        </div>
-        {players.map(([id, p]) => (
-          <div className="player-row" key={id}>
-            <span className="player-dot" />
-            <span className="player-name">{p.name}</span>
-            {p.isHost && <span className="player-tag">Host</span>}
+      <div className="card mb-6 border-blue-100 bg-white shadow-sm">
+        <div className="flex items-center justify-between mb-4">
+          <div className="ticket-label flex items-center gap-1.5 m-0 text-slate-500">
+            <Users size={14} /> players ({players.length}/2)
           </div>
-        ))}
+        </div>
+        
+        <div className="space-y-1">
+          {players.map(([id, p]) => (
+            <div className="player-row bg-slate-50/50 rounded-xl px-4 py-3 border border-slate-100" key={id}>
+              <span className="player-dot" />
+              <span className="player-name text-slate-700">{p.name}</span>
+              {p.isHost && <span className="player-tag">Host</span>}
+              {id === playerId && <span className="text-xs font-bold text-slate-400 uppercase ml-2">(You)</span>}
+            </div>
+          ))}
+          {players.length < 2 && (
+            <div className="player-row bg-slate-50 border border-dashed border-slate-200 rounded-xl px-4 py-3 justify-center text-slate-400 text-sm font-medium">
+              Waiting for player 2...
+            </div>
+          )}
+        </div>
       </div>
 
       <CallErrorBoundary>
@@ -217,9 +227,11 @@ export default function RoomPage() {
         />
       </CallErrorBoundary>
 
-      <button className="btn-ghost" onClick={leaveRoom}>
-        Leave room
-      </button>
+      <div className="text-center mt-8">
+        <button className="btn-ghost text-red-500 hover:text-red-600 hover:bg-red-50" onClick={leaveRoom}>
+          Leave room
+        </button>
+      </div>
     </main>
   );
 }

@@ -1,5 +1,6 @@
 import { ref, update } from "firebase/database";
 import { db } from "@/lib/firebase";
+import { Check } from "lucide-react";
 
 type Prompt = { a: string; b: string };
 type Room = {
@@ -60,36 +61,49 @@ export default function GameView({
   // ---------- Finished screen ----------
   if (room.status === "finished") {
     return (
-      <main className="shell">
-        <div className="eyebrow" style={{ marginBottom: 10 }}>
-          this or that · game over
-        </div>
-        <div className="card" style={{ textAlign: "center", marginBottom: 16 }}>
-          <p style={{ marginTop: 0 }}>
-            That's all {game.prompts.length} rounds! Thanks for playing.
-          </p>
-        </div>
-        {isHost ? (
-          <button className="btn btn-primary" onClick={playAgain}>
-            Back to lobby
-          </button>
-        ) : (
-          <div className="card" style={{ textAlign: "center", color: "var(--ink-dim)" }}>
-            Waiting for the host to return to the lobby…
+      <main className="shell-sm pt-12 fade-in">
+        <div className="card text-center mb-8 border-purple-200 shadow-xl shadow-purple-100/50 py-12 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-purple-400 opacity-10 rounded-full blur-3xl"></div>
+          <div className="relative z-10">
+            <div className="mx-auto w-16 h-16 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center text-white mb-6 shadow-lg shadow-emerald-200">
+              <Check size={32} strokeWidth={3} />
+            </div>
+            <h2 className="font-display font-bold text-3xl text-slate-900 mb-2">Game Over!</h2>
+            <p className="text-slate-500 mb-8 max-w-xs mx-auto">
+              That's all {game.prompts.length} rounds completed. Great choices!
+            </p>
+
+            {isHost ? (
+              <button className="btn btn-primary" onClick={playAgain}>
+                Play Again
+              </button>
+            ) : (
+              <div className="bg-slate-50 text-slate-500 font-medium py-3 px-6 rounded-xl border border-slate-100 inline-block">
+                Waiting for host to restart...
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </main>
     );
   }
 
   // ---------- Active round ----------
   return (
-    <main className="shell">
-      <div className="eyebrow" style={{ marginBottom: 10 }}>
-        this or that · round {round + 1} of {game.prompts.length}
+    <main className="shell-sm pt-8 fade-in">
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-pink-100 text-pink-600 flex items-center justify-center font-bold text-sm">
+            {round + 1}
+          </div>
+          <span className="font-display font-bold text-lg text-slate-700">This or That</span>
+        </div>
+        <div className="text-sm font-bold text-slate-400 bg-white px-3 py-1 rounded-full shadow-sm border border-slate-100">
+          Round {round + 1} of {game.prompts.length}
+        </div>
       </div>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 18 }}>
+      <div className="flex flex-col gap-4 mb-8">
         <ChoiceButton
           label={prompt.a}
           selected={myVote === "a"}
@@ -98,7 +112,14 @@ export default function GameView({
           revealed={allVoted}
           count={countA}
           total={playerIds.length}
+          colorTheme="pink"
         />
+        
+        <div className="flex items-center justify-center my-1 relative">
+          <div className="absolute w-full h-px bg-slate-200"></div>
+          <span className="relative bg-slate-50 px-4 text-xs font-bold uppercase tracking-widest text-slate-400">OR</span>
+        </div>
+
         <ChoiceButton
           label={prompt.b}
           selected={myVote === "b"}
@@ -107,26 +128,33 @@ export default function GameView({
           revealed={allVoted}
           count={countB}
           total={playerIds.length}
+          colorTheme="blue"
         />
       </div>
 
       {!allVoted && (
-        <div className="card" style={{ textAlign: "center", color: "var(--ink-dim)", marginBottom: 14 }}>
-          {myVote ? "Waiting on the rest of the group…" : "Tap the one you'd pick."}
-          <div style={{ marginTop: 6, fontFamily: "var(--font-mono)", fontSize: 12 }}>
-            {playerIds.filter((id) => votes[id]).length}/{playerIds.length} answered
+        <div className="text-center bg-white border border-slate-100 rounded-2xl p-4 shadow-sm mb-6">
+          <div className="font-medium text-slate-600">
+            {myVote ? "Waiting on others..." : "Make your choice!"}
+          </div>
+          <div className="mt-2 flex justify-center gap-1">
+            {playerIds.map(id => (
+              <div key={id} className={`w-2 h-2 rounded-full ${votes[id] ? "bg-emerald-400" : "bg-slate-200"}`}></div>
+            ))}
           </div>
         </div>
       )}
 
       {allVoted && isHost && (
-        <button className="btn btn-primary" onClick={nextRound}>
-          {isLastRound ? "Finish game" : "Next round"}
-        </button>
+        <div className="slide-up text-center mt-8">
+          <button className="btn btn-primary shadow-xl shadow-purple-200" onClick={nextRound}>
+            {isLastRound ? "View Results" : "Next Round"}
+          </button>
+        </div>
       )}
       {allVoted && !isHost && (
-        <div className="card" style={{ textAlign: "center", color: "var(--ink-dim)" }}>
-          Waiting for the host to continue…
+        <div className="slide-up text-center bg-purple-50 text-purple-600 font-bold py-4 rounded-xl border border-purple-100 mt-8">
+          Waiting for host...
         </div>
       )}
     </main>
@@ -141,6 +169,7 @@ function ChoiceButton({
   revealed,
   count,
   total,
+  colorTheme
 }: {
   label: string;
   selected: boolean;
@@ -149,40 +178,57 @@ function ChoiceButton({
   revealed: boolean;
   count: number;
   total: number;
+  colorTheme: "pink" | "blue"
 }) {
   const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+  
+  const themeClasses = {
+    pink: {
+      selected: "border-pink-500 ring-4 ring-pink-100 bg-white",
+      bar: "bg-pink-100",
+      text: "text-pink-600",
+      default: "border-white hover:border-pink-200 hover:bg-pink-50/30"
+    },
+    blue: {
+      selected: "border-blue-500 ring-4 ring-blue-100 bg-white",
+      bar: "bg-blue-100",
+      text: "text-blue-600",
+      default: "border-white hover:border-blue-200 hover:bg-blue-50/30"
+    }
+  };
+
+  const currentTheme = themeClasses[colorTheme];
+
   return (
     <button
       onClick={onClick}
       disabled={disabled}
-      className="card"
+      className={`relative w-full text-left rounded-2xl overflow-hidden transition-all duration-300 bg-white shadow-md
+        ${selected ? currentTheme.selected : currentTheme.default}
+        ${disabled && !selected ? "opacity-60" : ""}
+      `}
       style={{
-        position: "relative",
-        textAlign: "left",
-        cursor: disabled ? "default" : "pointer",
-        border: selected ? "1px solid var(--hot)" : "1px solid var(--line)",
-        overflow: "hidden",
+        borderWidth: selected ? 2 : 2,
+        cursor: disabled ? "default" : "pointer"
       }}
     >
       {revealed && (
         <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            width: `${pct}%`,
-            background: "rgba(255, 61, 110, 0.14)",
-            transition: "width 0.4s ease",
-          }}
+          className={`absolute top-0 bottom-0 left-0 transition-all duration-700 ease-out ${currentTheme.bar}`}
+          style={{ width: `${pct}%` }}
         />
       )}
-      <div style={{ position: "relative", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <span style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 18 }}>
+      
+      <div className="relative z-10 p-6 md:p-8 flex justify-between items-center gap-4">
+        <span className={`font-display font-bold text-2xl md:text-3xl leading-tight ${selected ? currentTheme.text : "text-slate-800"}`}>
           {label}
         </span>
+        
         {revealed && (
-          <span style={{ fontFamily: "var(--font-mono)", fontSize: 13, color: "var(--ink-dim)" }}>
-            {count}/{total}
-          </span>
+          <div className="flex flex-col items-end shrink-0">
+            <span className={`font-display font-bold text-3xl ${currentTheme.text}`}>{pct}%</span>
+            <span className="text-xs font-bold text-slate-400 uppercase">{count} {count === 1 ? "vote" : "votes"}</span>
+          </div>
         )}
       </div>
     </button>

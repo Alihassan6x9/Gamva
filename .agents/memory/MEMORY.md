@@ -1,2 +1,3 @@
 - [Vercel/Next.js port without src/ layout](vercel-app-router-port.md) — App Router (`app/`) migrations aren't handled by fullstack-copy-frontend.sh's auto-detection; port files by hand instead of forcing the script.
 - [Firebase rules deploy & verify](firebase-rules-deploy-and-verify.md) — no CLI/service-account deploy path here; have the user paste rules manually, then verify via anonymous-auth REST calls instead of a headless browser.
+- [Design subagent CSS/theme rewrites need a Tailwind version check](design-subagent-tailwind-v4-check.md) — a full index.css rewrite can silently reintroduce Tailwind v3 syntax in a v4 project, breaking every utility class with no build error.
