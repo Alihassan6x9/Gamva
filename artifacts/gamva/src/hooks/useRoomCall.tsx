@@ -70,12 +70,13 @@ export function useRoomCall({
   // Publish mic/camera status onto the player's existing Realtime Database
   // record so teammates can see call state without inspecting raw WebRTC.
   useEffect(() => {
-    if (!isFirebaseConfigured) return;
+    if (!isFirebaseConfigured || !selfId) return;   // add the !selfId check
     update(ref(db, `rooms/${roomCode}/players/${selfId}`), {
       micOn: media.micOn,
       cameraOn: media.cameraOn,
     }).catch(() => {});
   }, [roomCode, selfId, media.micOn, media.cameraOn]);
+
 
   // Drop call state for players who've left the room.
   const remoteKey = remotePeerIds.join(",");
