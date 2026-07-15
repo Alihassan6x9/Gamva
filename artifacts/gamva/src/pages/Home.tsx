@@ -129,7 +129,12 @@ export default function HomePage() {
       console.log("Room:", room);
       console.log("Player Keys:", playerKeys);
       console.log("Player Count:", playerKeys.length);
-      const existingPlayerCount = playerKeys.length;
+      console.log("room.players =", room.players);
+      alert(JSON.stringify(room.players));
+
+      const existingPlayerCount = room.players
+        ? Object.keys(room.players).length
+        : 0;
       if (existingPlayerCount >= 2) {
         setError("Room is full. Only 2 players are allowed.");
         setLoading(false);
