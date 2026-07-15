@@ -1,5 +1,5 @@
 import { initializeApp, getApps, getApp, type FirebaseApp } from "firebase/app";
-import { getDatabase, type Database } from "firebase/database";
+import { getDatabase, type Database, ref, onValue, onDisconnect } from "firebase/database";
 import { getAuth, signInAnonymously, onAuthStateChanged, type Auth, type User } from "firebase/auth";
 import { getFirestore, type Firestore } from "firebase/firestore";
 
@@ -72,4 +72,19 @@ export function ensureSignedIn(): Promise<User> {
   });
 
   return readyPromise;
+}
+
+// Registers Firebase's built-in presence detection so a player is
+// reliably removed from a room if their connection drops — even after
+// a phone locks/backgrounds or the network flaps and reconnects.
+export function trackPresence(code: string, playerId: string) {
+  if (!isFirebaseConfigured || !dbInstance) return;
+
+  const connectedRef = ref(dbInstance, ".info/connected");
+  const playerRef = ref(dbInstance, `rooms/${code}/players/${playerId}`);
+
+  onValue(connectedRef, (snap) => {
+    if (snap.val() === false) return;
+    onDisconnect(playerRef).remove();
+  });
 }

@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { useLocation, useParams } from "wouter";
-import { ref, onValue, onDisconnect, remove, update } from "firebase/database";
-import { db, ensureSignedIn, isFirebaseConfigured } from "@/lib/firebase";
+import { ref, onValue, remove, update } from "firebase/database";
+
+import { db, ensureSignedIn, isFirebaseConfigured, trackPresence } from "@/lib/firebase";
+
 import { pickPrompts } from "@/lib/prompts/thisOrThat";
 import { useRoomCall } from "@/hooks/useRoomCall";
 import CommunicationSettings from "@/components/call/CommunicationSettings";
@@ -34,13 +36,14 @@ export default function RoomPage() {
 
     let unsubscribe = () => {};
 
-    (async () => {
-      await ensureSignedIn();
-      const roomRef = ref(db, `rooms/${code}`);
+        (async () => {
+          await ensureSignedIn();
+          const roomRef = ref(db, `rooms/${code}`);
 
-      onDisconnect(ref(db, `rooms/${code}/players/${storedId}`)).remove();
+          trackPresence(code, storedId);
 
-      unsubscribe = onValue(roomRef, (snap) => {
+          unsubscribe = onValue(roomRef, (snap) => {
+
         if (!snap.exists()) {
           setNotFound(true);
           return;
