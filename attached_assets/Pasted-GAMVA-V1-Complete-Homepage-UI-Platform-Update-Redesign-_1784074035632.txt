@@ -1,0 +1,321 @@
+GAMVA V1 – Complete Homepage, UI & Platform Update
+
+Redesign the entire Gamva platform into a modern, premium multiplayer gaming website while preserving all existing Firebase authentication, routing, room creation, room joining, and multiplayer functionality.
+
+The project should be scalable, clean, reusable, and ready for future expansion.
+
+⸻
+
+Theme & Design
+
+Replace the current dark theme with a modern Light Gaming Theme.
+
+Use:
+
+* White backgrounds
+* Light Blue
+* Sky Blue
+* Soft Purple
+* Lavender
+* Mint Green
+* Soft Pink accents
+* Smooth colorful gradients
+* Glassmorphism cards
+* Rounded corners
+* Soft shadows
+* Premium spacing
+* Modern playful animations
+* Floating background shapes
+* Smooth page transitions
+* Responsive on mobile, tablet and desktop
+* Fast loading
+
+The website should feel fun, premium, colorful and welcoming.
+
+Keep the existing splash screen.
+
+⸻
+
+Background Music
+
+Add relaxing background music across the website.
+
+Requirements:
+
+* Calm instrumental music
+* Royalty-free music (or placeholder audio)
+* Default volume: 15–20%
+* Auto-play only if browser allows it; otherwise start after the user’s first interaction.
+* Loop continuously
+* Fade in smoothly
+* Never interrupt gameplay
+
+Navigation should include a Music button.
+
+Users can:
+
+* Play
+* Pause
+* Mute
+* Increase Volume
+* Decrease Volume
+
+Save music preferences for future visits.
+
+⸻
+
+Navigation Bar
+
+Create a modern sticky navigation bar.
+
+Left:
+
+GAMVA Logo
+
+Right:
+
+🏠 Home
+
+🎮 Games
+
+❤️ Couples (18+)
+
+👨‍👩‍👧 Family
+
+👑 Premium
+
+👤 Profile
+
+🔊 Music
+
+Include:
+
+* Mobile hamburger menu
+* Smooth navigation animations
+* Sticky while scrolling
+
+⸻
+
+Hero Section
+
+Large premium hero section.
+
+Title:
+
+Play Fun Games With Friends & Family
+
+Subtitle:
+
+Choose your favorite game, create a private room and enjoy multiplayer fun together.
+
+Buttons:
+
+Play Games
+
+Browse Categories
+
+Background:
+
+Modern colorful gaming illustration with floating glowing elements.
+
+⸻
+
+Explore Games
+
+Create beautiful premium game cards.
+
+🎉 Party Games
+
+* This or That
+    Status: Playable
+* Truth or Dare
+    Status: Coming Soon
+* Never Have I Ever
+    Status: Coming Soon
+* Would You Rather
+    Status: Coming Soon
+* Most Likely To
+    Status: Coming Soon
+* Two Truths and a Lie
+    Status: Coming Soon
+
+⸻
+
+❤️ Couples Games (18+)
+
+Every card must display an 18+ badge.
+
+Games:
+
+* Truth or Dare 18+
+* Never Have I Ever 18+
+* What I Prefer 18+
+
+Status:
+
+Coming Soon
+
+⸻
+
+👨‍👩‍👧 Family Games
+
+* Kids Truth or Dare
+* Family Would You Rather
+* Family Quiz
+
+Status:
+
+Coming Soon
+
+⸻
+
+🎲 More Games
+
+Create premium placeholder cards.
+
+Title:
+
+More Games Coming Soon
+
+The platform should feel like it will eventually contain dozens of games.
+
+⸻
+
+Universal 2-Player System
+
+Apply this system to EVERY game.
+
+Rules:
+
+Maximum 2 players per room.
+
+Host becomes Player 1.
+
+Joining player becomes Player 2.
+
+No third player may join.
+
+If another player tries joining:
+
+Show:
+
+“Room is full. Only 2 players are allowed.”
+
+Game starts only when both players are connected.
+
+Reuse this room system across every game.
+
+⸻
+
+Future Voice & Video UI
+
+Prepare the interface only.
+
+Do NOT implement voice/video calling yet.
+
+Inside every game room include:
+
+🎤 Microphone button
+
+📹 Camera button
+
+Mute/Unmute
+
+Camera On/Off
+
+Display controls only for the two connected players.
+
+Keep the UI ready for future WebRTC integration.
+
+⸻
+
+Premium Page
+
+Create a professional Premium page.
+
+Include:
+
+Premium Badge
+
+Benefits
+
+Monthly Plan
+
+Yearly Plan
+
+Payment placeholders:
+
+* Easypaisa
+* JazzCash
+* Debit Card
+* Credit Card
+
+Do not implement payment processing yet.
+
+⸻
+
+Profile Page
+
+Create a beautiful profile page.
+
+Display:
+
+Avatar
+
+Nickname
+
+Player Level
+
+XP
+
+Games Played
+
+Games Won
+
+Win Rate
+
+Favorite Game
+
+Achievements (Coming Soon)
+
+Recent Activity (Placeholder)
+
+⸻
+
+Footer
+
+Include:
+
+About
+
+Privacy Policy
+
+Terms of Service
+
+Contact
+
+Support
+
+Follow Us
+
+Copyright © Gamva
+
+⸻
+
+Important
+
+Only This or That should be fully playable in Version 1.
+
+All other games should open professional Coming Soon pages until their gameplay is developed.
+
+Do not break:
+
+* Firebase Authentication
+* Room Creation
+* Room Joining
+* Routing
+* Multiplayer Logic
+
+Maintain clean, modular, reusable code for future expansion.
+
+The entire website should feel like a premium gaming platform suitable for a global audience.
