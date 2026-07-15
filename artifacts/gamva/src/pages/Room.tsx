@@ -53,8 +53,6 @@ export default function RoomPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [code]);
 
-  const [room, setRoom] = useState<any>(null);
-
   console.log("ROOM OBJECT:", room);
   console.log("ROOM PLAYERS:", room?.players);
   console.log("PLAYER ENTRIES:", Object.entries(room?.players || {}));
@@ -65,10 +63,7 @@ export default function RoomPage() {
         (a, b) => (a[1].joinedAt || 0) - (b[1].joinedAt || 0)
       )
     : [];
-    ? Object.entries(room.players as Record<string, any>).sort(
-        (a, b) => (a[1].joinedAt || 0) - (b[1].joinedAt || 0)
-      )
-    : [];
+
   const remotePeerIds = useMemo(
     () => players.map(([id]) => id).filter((id) => id !== playerId),
     // eslint-disable-next-line react-hooks/exhaustive-deps
