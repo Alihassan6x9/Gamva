@@ -26,15 +26,9 @@ export default function HomePage() {
   const searchParams = new URLSearchParams(search);
   const gameParam = searchParams.get("game");
 
-  // ADD THIS
-
   if (gameParam) {
-
     setSelectedGame(gameParam);
-
   }
-
-  
 
   const alreadySeen = sessionStorage.getItem("gamva:splashSeen");
   const joinParam = searchParams.get("join");
@@ -60,9 +54,6 @@ export default function HomePage() {
   return () => clearTimeout(timer);
 
 }, [search]);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   function validatePlayer() {
     if (!name.trim()) return "Enter a name so other players know it's you.";
     const ageNum = Number(age);
