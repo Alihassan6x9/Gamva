@@ -1,6 +1,7 @@
 import { ref, update } from "firebase/database";
 import { db } from "@/lib/firebase";
 import { Check } from "lucide-react";
+import TruthOrDareGame from "./games/TruthOrDareGame";
 
 type Prompt = { a: string; b: string };
 type Room = {
