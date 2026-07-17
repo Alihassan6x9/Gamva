@@ -28,8 +28,9 @@ export default function HomePage() {
     const gameParam = searchParams.get("game");
 
     if (gameParam) {
-      setSelectedGame(gameParam);
-    }
+  setSelectedGame(gameParam);
+  setScreen("create");
+}
 
     const alreadySeen = sessionStorage.getItem("gamva:splashSeen");
     const joinParam = searchParams.get("join");
@@ -84,10 +85,7 @@ export default function HomePage() {
         createdAt: serverTimestamp(),
         status: "lobby",
 
-        gameType:
-          selectedGame === "truth-or-dare-18"
-            ? "truth-or-dare"
-            : "this-or-that",
+        gameType: selectedGame,
 
         hostId: playerId,
 
