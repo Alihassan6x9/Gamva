@@ -43,4 +43,8 @@ function App() {
           <Router />
         </Layout>
       </AudioProvider>
-    
+    </WouterRouter>
+  );
+}
+
+export default App;
