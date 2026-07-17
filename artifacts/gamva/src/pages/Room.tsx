@@ -98,21 +98,26 @@ export default function RoomPage() {
     setTimeout(() => setCopied(false), 1800);
   }
 
-  async function startGame() {
+  async function startGame(gameType = "this-or-that") {
 
-  const prompts = pickTruthOrDare(8);
+  const prompts =
+    gameType === "truth-or-dare"
+      ? pickTruthOrDare(24)
+      : pickPrompts(24);
+
 
   await update(ref(db, `rooms/${code}`), {
     status: "playing",
+
     game: {
-      type: "truth-or-dare",
+      type: gameType,
       round: 0,
       prompts,
       votes: {},
     },
+
   });
 }
-
   if (notFound) {
     return (
       <main className="shell fade-in flex items-center justify-center">
