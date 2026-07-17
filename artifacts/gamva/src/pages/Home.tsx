@@ -358,12 +358,12 @@ export default function HomePage() {
             colorClass="from-pink-500 to-orange-400"
           />
           <GameCard 
-            title="Truth or Dare 18+" 
-            description="Turn up the heat. Premium adult edition." 
-            slug="truth-or-dare-18" 
-            is18Plus
-            colorClass="from-red-500 to-rose-500"
-          />
+  title="Truth or Dare" 
+  description="Answer questions or complete fun dares with friends."
+  slug="truth-or-dare"
+  isPlayable
+  colorClass="from-red-500 to-rose-500"
+/>
           <div className="md:hidden lg:block">
             <GameCard 
               title="Family Quiz" 
