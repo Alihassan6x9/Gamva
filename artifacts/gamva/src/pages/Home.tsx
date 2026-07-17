@@ -15,7 +15,7 @@ export default function HomePage() {
   const [, navigate] = useLocation();
   const search = useSearch();
 
-  const [screen, setScreen] = useState<Screen>("splash");
+  const [selectedGame, setSelectedGame] = useState("this-or-that");
   const [name, setName] = useState("");
   const [age, setAge] = useState("");
   const [joinCode, setJoinCode] = useState("");
