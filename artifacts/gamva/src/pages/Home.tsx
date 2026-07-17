@@ -26,15 +26,15 @@ export default function HomePage() {
   const searchParams = new URLSearchParams(search);
   const gameParam = searchParams.get("game");
 
-  if (gameParam === "this-or-that") {
-    navigate("/games/this-or-that");
-    return;
+  // ADD THIS
+
+  if (gameParam) {
+
+    setSelectedGame(gameParam);
+
   }
 
-  if (gameParam === "truth-or-dare-18") {
-    navigate("/games/truth-or-dare-18");
-    return;
-  }
+  
 
   const alreadySeen = sessionStorage.getItem("gamva:splashSeen");
   const joinParam = searchParams.get("join");
@@ -59,7 +59,7 @@ export default function HomePage() {
 
   return () => clearTimeout(timer);
 
-}, [search, navigate]);
+}, [search]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -89,11 +89,17 @@ export default function HomePage() {
       }
 
       await set(ref(db, `rooms/${code}`), {
-        createdAt: serverTimestamp(),
-        status: "lobby",
-        hostId: playerId,
-        players: {
-          [playerId]: {
+  createdAt: serverTimestamp(),
+  status: "lobby",
+
+  gameType:
+    selectedGame === "truth-or-dare-18"
+      ? "truth-or-dare"
+      : "this-or-that",
+
+  hostId: playerId,
+
+  players: {
             name: name.trim(),
             age: Number(age),
             isHost: true,
