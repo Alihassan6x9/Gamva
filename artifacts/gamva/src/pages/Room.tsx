@@ -13,6 +13,14 @@ import CallErrorBoundary from "@/components/call/CallErrorBoundary";
 import GameView from "./GameView";
 import { Copy, Check, Users } from "lucide-react";
 
+type PlayerData = {
+  name: string;
+  isHost?: boolean;
+  micOn?: boolean;
+  cameraOn?: boolean;
+  joinedAt?: number;
+};
+
 export default function RoomPage() {
   const params = useParams<{ code: string }>();
   const code = (params.code || "").toUpperCase();
@@ -37,14 +45,13 @@ export default function RoomPage() {
 
     let unsubscribe = () => {};
 
-        (async () => {
-          await ensureSignedIn();
-          const roomRef = ref(db, `rooms/${code}`);
+    (async () => {
+      await ensureSignedIn();
+      const roomRef = ref(db, `rooms/${code}`);
 
-          trackPresence(code, storedId);
+      trackPresence(code, storedId);
 
-          unsubscribe = onValue(roomRef, (snap) => {
-
+      unsubscribe = onValue(roomRef, (snap) => {
         if (!snap.exists()) {
           setNotFound(true);
           return;
@@ -57,23 +64,17 @@ export default function RoomPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [code]);
 
-  console.log("ROOM OBJECT:", room);
-  console.log("ROOM PLAYERS:", room?.players);
-  console.log("PLAYER ENTRIES:", Object.entries(room?.players || {}));
-  console.log("PLAYER COUNT:", Object.entries(room?.players || {}).length);
-
-  const players = Object.entries(room?.players || {})
-  .filter(([id]) => id)
-  .sort(
-    ([, a], [, b]) =>
-      Number((a as any).joinedAt || 0) -
-      Number((b as any).joinedAt || 0)
+  const players = useMemo(
+    () =>
+      (Object.entries(room?.players || {}) as [string, PlayerData][])
+        .filter(([id]) => id)
+        .sort(([, a], [, b]) => Number(a.joinedAt || 0) - Number(b.joinedAt || 0)),
+    [room?.players]
   );
 
   const remotePeerIds = useMemo(
     () => players.map(([id]) => id).filter((id) => id !== playerId),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [players.map(([id]) => id).join(","), playerId]
+    [players, playerId]
   );
 
   const call = useRoomCall({ roomCode: code, selfId: playerId || "", remotePeerIds });
@@ -100,25 +101,24 @@ export default function RoomPage() {
   }
 
   async function startGame() {
-  const gameType = room.gameType || "this-or-that";
+    if (!room) return;
+    const gameType = room.gameType || "this-or-that";
 
-  const prompts =
-    gameType === "truth-or-dare"
-      ? pickTruthOrDare(24)
-      : pickPrompts(24);
+    const prompts =
+      gameType === "truth-or-dare" ? pickTruthOrDare(24) : pickPrompts(24);
 
     await update(ref(db, `rooms/${code}`), {
-    status: "playing",
-    game: {
-      type: gameType,
-      round: 0,
-      prompts,
-      votes: {},
-    },
-  });
-}
+      status: "playing",
+      game: {
+        type: gameType,
+        round: 0,
+        prompts,
+        votes: {},
+      },
+    });
+  }
 
-if (notFound) {
+  if (notFound) {
     return (
       <main className="shell fade-in flex items-center justify-center">
         <div className="card text-center max-w-sm w-full py-12">
@@ -145,16 +145,12 @@ if (notFound) {
 
   const isHost = room.hostId === playerId;
   const selfName = room.players?.[playerId]?.name ?? "";
-  const playerInfos = players.map(([id, p]) => {
-  const player = p as any;
-
-  return {
+  const playerInfos = players.map(([id, player]) => ({
     id,
     name: player.name,
     micOn: !!player.micOn,
     cameraOn: !!player.cameraOn,
-  };
-});
+  }));
 
   if (room.status === "playing" || room.status === "finished") {
     return (
@@ -184,7 +180,7 @@ if (notFound) {
   return (
     <main className="shell-sm w-full fade-in pt-8">
       <CallErrorBoundary>{call.connectionsNode}</CallErrorBoundary>
-      
+
       <div className="text-center mb-8">
         <h1 className="font-display font-bold text-3xl text-slate-900 mb-2">Game Lobby</h1>
         <p className="text-slate-500">Wait for everyone to join before starting.</p>
@@ -196,8 +192,8 @@ if (notFound) {
           <div className="ticket-code">{code}</div>
         </div>
         <div className="ticket-divider" />
-        <button 
-          className="bg-purple-50 hover:bg-purple-100 text-purple-700 px-4 py-3 rounded-xl font-bold text-sm transition-colors flex flex-col items-center gap-1 w-[120px]" 
+        <button
+          className="bg-purple-50 hover:bg-purple-100 text-purple-700 px-4 py-3 rounded-xl font-bold text-sm transition-colors flex flex-col items-center gap-1 w-[120px]"
           onClick={copyLink}
         >
           {copied ? <Check size={20} className="text-emerald-500" /> : <Copy size={20} />}
@@ -211,64 +207,59 @@ if (notFound) {
             <Users size={14} /> players ({players.length}/2)
           </div>
         </div>
-        
+
         <div className="space-y-1">
-  {players.map(([id, p]) => {
-    const player = p as any;
+          {players.map(([id, player]) => (
+            <div
+              key={id}
+              className="player-row bg-slate-50/50 rounded-xl px-4 py-3 border border-slate-100"
+            >
+              <span className="player-dot" />
 
-    return (
-      <div
-        key={id}
-        className="player-row bg-slate-50/50 rounded-xl px-4 py-3 border border-slate-100"
-      >
-        <span className="player-dot" />
+              <span className="player-name text-slate-700">
+                {player.name}
+              </span>
 
-        <span className="player-name text-slate-700">
-          {player.name}
-        </span>
+              {player.isHost && (
+                <span className="player-tag">
+                  Host
+                </span>
+              )}
 
-        {player.isHost && (
-          <span className="player-tag">
-            Host
-          </span>
-        )}
+              {id === playerId && (
+                <span className="text-xs font-bold text-slate-400 uppercase ml-2">
+                  (You)
+                </span>
+              )}
+            </div>
+          ))}
 
-        {id === playerId && (
-          <span className="text-xs font-bold text-slate-400 uppercase ml-2">
-            (You)
-          </span>
-        )}
+          {players.length < 2 && (
+            <div className="player-row bg-slate-50 border border-dashed border-slate-200 rounded-xl px-4 py-3 justify-center text-slate-400 text-sm font-medium">
+              Waiting for player 2...
+            </div>
+          )}
+        </div>
       </div>
-    );
-  })}
 
-  {players.length < 2 && (
-    <div className="player-row bg-slate-50 border border-dashed border-slate-200 rounded-xl px-4 py-3 justify-center text-slate-400 text-sm font-medium">
-      Waiting for player 2...
-    </div>
-  )}
-</div>
-
-</div> {/* <-- Close the card */}
-
-<CallErrorBoundary>
-  <CommunicationSettings
-    selfId={playerId}
-    selfName={selfName}
-    players={playerInfos}
-    localStream={call.localStream}
-    micOn={call.micOn}
-    cameraOn={call.cameraOn}
-    micBusy={call.micBusy}
-    cameraBusy={call.cameraBusy}
-    mediaError={call.mediaError}
-    onToggleMic={call.toggleMic}
-    onToggleCamera={call.toggleCamera}
-    remotePeers={call.remotePeers}
-    isHost={isHost}
-    canStart={players.length >= 2}
-    onStartGame={startGame}
-  />
+      <CallErrorBoundary>
+        <CommunicationSettings
+          selfId={playerId}
+          selfName={selfName}
+          players={playerInfos}
+          localStream={call.localStream}
+          micOn={call.micOn}
+          cameraOn={call.cameraOn}
+          micBusy={call.micBusy}
+          cameraBusy={call.cameraBusy}
+          mediaError={call.mediaError}
+          onToggleMic={call.toggleMic}
+          onToggleCamera={call.toggleCamera}
+          remotePeers={call.remotePeers}
+          isHost={isHost}
+          canStart={players.length >= 2}
+          onStartGame={startGame}
+        />
       </CallErrorBoundary>
 
       <div className="text-center mt-8">
