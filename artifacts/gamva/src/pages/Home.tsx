@@ -91,14 +91,15 @@ export default function HomePage() {
   hostId: playerId,
 
   players: {
-            name: name.trim(),
-            age: Number(age),
-            isHost: true,
-            joinedAt: serverTimestamp(),
-            uid: user.uid,
-          },
-        },
-      });
+    [playerId]: {
+      name: name.trim(),
+      age: Number(age),
+      isHost: true,
+      joinedAt: serverTimestamp(),
+      uid: user.uid,
+    },
+  },
+});
 
       localStorage.setItem(`gamva:${code}:playerId`, playerId);
       localStorage.setItem("gamva:name", name.trim());
