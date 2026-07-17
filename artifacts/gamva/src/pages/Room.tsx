@@ -98,13 +98,13 @@ export default function RoomPage() {
     setTimeout(() => setCopied(false), 1800);
   }
 
-  async function startGame(gameType = "this-or-that") {
+  async function startGame() {
+  const gameType = room.gameType || "this-or-that";
 
   const prompts =
     gameType === "truth-or-dare"
-      ? pickTruthOrDare(24)
+      ? pickTruthOrDar (24)
       : pickPrompts(24);
-
 
   await update(ref(db, `rooms/${code}`), {
     status: "playing",
@@ -115,10 +115,8 @@ export default function RoomPage() {
       prompts,
       votes: {},
     },
-
   });
-}
-  if (notFound) {
+}  if (notFound) {
     return (
       <main className="shell fade-in flex items-center justify-center">
         <div className="card text-center max-w-sm w-full py-12">
