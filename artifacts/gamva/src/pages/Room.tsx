@@ -5,6 +5,7 @@ import { ref, onValue, remove, update } from "firebase/database";
 import { db, ensureSignedIn, isFirebaseConfigured, trackPresence } from "@/lib/firebase";
 
 import { pickPrompts } from "@/lib/prompts/thisOrThat";
+import { pickTruthOrDare } from "@/lib/prompts/truthOrDare";
 import { useRoomCall } from "@/hooks/useRoomCall";
 import CommunicationSettings from "@/components/call/CommunicationSettings";
 import CallBar from "@/components/call/CallBar";
