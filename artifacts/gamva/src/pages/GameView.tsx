@@ -3,17 +3,19 @@ import { db } from "@/lib/firebase";
 import { Check } from "lucide-react";
 import TruthOrDareGame from "./games/TruthOrDareGame";
 
-type Prompt = { a: string; b: string };
+type Prompt =
+  | { a: string; b: string } // This or That
+  | { type: "truth" | "dare"; text: string }; // Truth or Dare
 type Room = {
   status: string;
   hostId: string;
   players?: Record<string, { name: string; isHost?: boolean; joinedAt?: number }>;
   game?: {
-    type: string;
-    round: number;
-    prompts: Prompt[];
-    votes?: Record<number, Record<string, "a" | "b">>;
-  };
+  type: string;
+  round: number;
+  prompts: Prompt[];
+  votes?: Record<number, Record<string, "a" | "b">>;
+};
 };
 
 export default function GameView({
@@ -27,7 +29,20 @@ export default function GameView({
   playerId: string;
   isHost: boolean;
 }) {
-  const game = room.game!;
+    const game = room.game!;
+
+  // ---------- Truth or Dare ----------
+  if (game.type === "truth-or-dare") {
+    return (
+      <TruthOrDareGame
+        code={code}
+        room={room}
+        playerId={playerId}
+        isHost={isHost}
+      />
+    );
+  }
+
   const players = room.players || {};
   const playerIds = Object.keys(players);
   const round = game.round;
