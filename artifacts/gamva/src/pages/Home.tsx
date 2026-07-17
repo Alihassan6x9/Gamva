@@ -23,27 +23,43 @@ export default function HomePage() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const alreadySeen = sessionStorage.getItem("gamva:splashSeen");
-    const searchParams = new URLSearchParams(search);
-    const joinParam = searchParams.get("join");
+  const searchParams = new URLSearchParams(search);
+  const gameParam = searchParams.get("game");
 
-    if (joinParam) setJoinCode(joinParam.toUpperCase());
+  if (gameParam === "this-or-that") {
+    navigate("/games/this-or-that");
+    return;
+  }
 
-    const savedName = localStorage.getItem("gamva:name");
-    const savedAge = localStorage.getItem("gamva:age");
-    if (savedName) setName(savedName);
-    if (savedAge) setAge(savedAge);
+  if (gameParam === "truth-or-dare-18") {
+    navigate("/games/truth-or-dare-18");
+    return;
+  }
 
-    if (alreadySeen) {
-      setScreen(joinParam ? "join" : "landing");
-      return;
-    }
+  const alreadySeen = sessionStorage.getItem("gamva:splashSeen");
+  const joinParam = searchParams.get("join");
 
-    const timer = setTimeout(() => {
-      sessionStorage.setItem("gamva:splashSeen", "1");
-      setScreen(joinParam ? "join" : "landing");
-    }, 2800);
-    return () => clearTimeout(timer);
+  if (joinParam) setJoinCode(joinParam.toUpperCase());
+
+  const savedName = localStorage.getItem("gamva:name");
+  const savedAge = localStorage.getItem("gamva:age");
+
+  if (savedName) setName(savedName);
+  if (savedAge) setAge(savedAge);
+
+  if (alreadySeen) {
+    setScreen(joinParam ? "join" : "landing");
+    return;
+  }
+
+  const timer = setTimeout(() => {
+    sessionStorage.setItem("gamva:splashSeen", "1");
+    setScreen(joinParam ? "join" : "landing");
+  }, 2800);
+
+  return () => clearTimeout(timer);
+
+}, [search, navigate]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
