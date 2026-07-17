@@ -299,7 +299,7 @@ export default function HomePage() {
             onClick={() => setScreen("create")}
             className="group relative bg-white border border-purple-200 rounded-2xl p-6 text-left shadow-lg shadow-purple-100 hover:shadow-xl hover:shadow-purple-200 hover:-translate-y-1 transition-all overflow-hidden"
           >
-            <div className="absolute top-0 right-0 w-24 h-24 bg-purple-400 opacity-10 rounded-full blur-2xl group-hover:opacity-20 transition-opacity"></div>
+            <div className="absolute top-0 right-0 w-24 h-24 bg-purple-400 opacity-10 rounded-full group-hover:opacity-20 transition-opacity"></div>
             <div className="w-12 h-12 bg-purple-100 text-purple-600 rounded-xl flex items-center justify-center mb-4">
               <Users size={24} />
             </div>
@@ -311,7 +311,7 @@ export default function HomePage() {
             onClick={() => setScreen("join")}
             className="group relative bg-white border border-blue-200 rounded-2xl p-6 text-left shadow-lg shadow-blue-100 hover:shadow-xl hover:shadow-blue-200 hover:-translate-y-1 transition-all overflow-hidden"
           >
-            <div className="absolute top-0 right-0 w-24 h-24 bg-blue-400 opacity-10 rounded-full blur-2xl group-hover:opacity-20 transition-opacity"></div>
+            <div className="absolute top-0 right-0 w-24 h-24 bg-blue-400 opacity-10 rounded-full group-hover:opacity-20 transition-opacity"></div>
             <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center mb-4">
               <Gamepad2 size={24} />
             </div>
@@ -328,7 +328,7 @@ export default function HomePage() {
         </button>
       </div>
 
-      <div className="px-6 md:px-0 py-8 border-y border-slate-200/50 bg-white/30 backdrop-blur-sm mb-16">
+      <div className="px-6 md:px-0 py-8 border-y border-slate-200/50 bg-slate-50 mb-16">
         <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-center gap-6 md:gap-12">
           <div className="flex items-center gap-2 text-slate-600 font-medium text-sm">
             <CheckCircle2 size={18} className="text-emerald-500" /> No signup required
