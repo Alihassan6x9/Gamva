@@ -21,6 +21,8 @@ export default function HomePage() {
   const [joinCode, setJoinCode] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [screen, setScreen] = useState<Screen>("splash");
+
 
   useEffect(() => {
   const searchParams = new URLSearchParams(search);
